@@ -1,0 +1,20 @@
+{\rtf1\fs24
+\trowd\trgaph75\trleft-75\intbl\trqc\clbrdrt\brdrs\cellx2592\clbrdrt\brdrs\cellx4176\clbrdrt\brdrs\cellx5760\clbrdrt\brdrs\cellx7344
+\ql \cell\qc (1)\cell\qc (2)\cell\qc (3)\cell\row
+\trowd\trgaph75\trleft-75\trqc\cellx2592\cellx4176\cellx5760\cellx7344
+\trowd\trgaph75\trleft-75\trqc\clbrdrb\brdrs\cellx2592\clbrdrb\brdrs\cellx4176\clbrdrb\brdrs\cellx5760\clbrdrb\brdrs\cellx7344
+\ql VARIABLES\cell\qc P5\cell\qc P25\cell\qc P50\cell\row
+\trowd\trgaph75\trleft-75\trqc\cellx2592\cellx4176\cellx5760\cellx7344
+\ql \cell\qc \cell\qc \cell\qc \cell\row
+\ql ΔGSV\cell\qc 0.000526\cell\qc -7.21e-05\cell\qc 0.000229\cell\row
+\ql \cell\qc (0.000493)\cell\qc (0.000216)\cell\qc (0.000156)\cell\row
+\ql Constant\cell\qc 0.0983***\cell\qc 0.109***\cell\qc 0.121***\cell\row
+\ql \cell\qc (0.00339)\cell\qc (0.00490)\cell\qc (0.00407)\cell\row
+\ql \cell\qc \cell\qc \cell\qc \cell\row
+\ql Observations\cell\qc 1,300\cell\qc 5,339\cell\qc 9,815\cell\row
+\trowd\trgaph75\trleft-75\trqc\trbrdrb\brdrs\clbrdrb\brdrs\cellx2592\clbrdrb\brdrs\cellx4176\clbrdrb\brdrs\cellx5760\clbrdrb\brdrs\cellx7344
+\ql Number of coin_id\cell\qc 5\cell\qc 25\cell\qc 50\cell\row
+\pard\qc
+Standard errors in parentheses\par
+*** p<0.01, ** p<0.05, * p<0.1\par
+}

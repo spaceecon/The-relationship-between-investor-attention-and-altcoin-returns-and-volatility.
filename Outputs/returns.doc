@@ -1,0 +1,30 @@
+{\rtf1\fs24
+\trowd\trgaph75\trleft-75\intbl\trqc\clbrdrt\brdrs\cellx2592\clbrdrt\brdrs\cellx4176\clbrdrt\brdrs\cellx5760\clbrdrt\brdrs\cellx7344
+\ql \cell\qc (1)\cell\qc (2)\cell\qc (3)\cell\row
+\trowd\trgaph75\trleft-75\trqc\cellx2592\cellx4176\cellx5760\cellx7344
+\trowd\trgaph75\trleft-75\trqc\clbrdrb\brdrs\cellx2592\clbrdrb\brdrs\cellx4176\clbrdrb\brdrs\cellx5760\clbrdrb\brdrs\cellx7344
+\ql VARIABLES\cell\qc P5\cell\qc P25\cell\qc P50\cell\row
+\trowd\trgaph75\trleft-75\trqc\cellx2592\cellx4176\cellx5760\cellx7344
+\ql \cell\qc \cell\qc \cell\qc \cell\row
+\ql ΔGSV\cell\qc 0.00595***\cell\qc 0.00346***\cell\qc 0.00326***\cell\row
+\ql \cell\qc (0.000673)\cell\qc (0.000302)\cell\qc (0.000221)\cell\row
+\ql ΔVIX\cell\qc -0.195***\cell\qc -0.217***\cell\qc -0.241***\cell\row
+\ql \cell\qc (0.0269)\cell\qc (0.0145)\cell\qc (0.0118)\cell\row
+\ql ΔEPU_US\cell\qc 0.000824\cell\qc 0.00263\cell\qc 0.00353\cell\row
+\ql \cell\qc (0.00741)\cell\qc (0.00394)\cell\qc (0.00318)\cell\row
+\ql ΔADS\cell\qc 0.00369\cell\qc 0.00497**\cell\qc 0.00641***\cell\row
+\ql \cell\qc (0.00358)\cell\qc (0.00199)\cell\qc (0.00170)\cell\row
+\ql ΔTERM\cell\qc -0.0726*\cell\qc -0.0589***\cell\qc -0.0747***\cell\row
+\ql \cell\qc (0.0430)\cell\qc (0.0214)\cell\qc (0.0169)\cell\row
+\ql L.returns\cell\qc 0.107***\cell\qc 0.0594***\cell\qc 0.0671***\cell\row
+\ql \cell\qc (0.0273)\cell\qc (0.0136)\cell\qc (0.0101)\cell\row
+\ql Constant\cell\qc 0.00299\cell\qc 0.00134\cell\qc 0.000743\cell\row
+\ql \cell\qc (0.00415)\cell\qc (0.00221)\cell\qc (0.00180)\cell\row
+\ql \cell\qc \cell\qc \cell\qc \cell\row
+\ql Observations\cell\qc 1,205\cell\qc 4,937\cell\qc 9,062\cell\row
+\trowd\trgaph75\trleft-75\trqc\trbrdrb\brdrs\clbrdrb\brdrs\cellx2592\clbrdrb\brdrs\cellx4176\clbrdrb\brdrs\cellx5760\clbrdrb\brdrs\cellx7344
+\ql Number of coin_id\cell\qc 5\cell\qc 25\cell\qc 50\cell\row
+\pard\qc
+Standard errors in parentheses\par
+*** p<0.01, ** p<0.05, * p<0.1\par
+}
