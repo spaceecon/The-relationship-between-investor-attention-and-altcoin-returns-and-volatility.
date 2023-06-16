@@ -1,0 +1,2019 @@
+{smcl}
+{com}{sf}{ul off}{txt}{.-}
+      name:  {res}<unnamed>
+       {txt}log:  {res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\STATA\Stata logs.smcl
+  {txt}log type:  {res}smcl
+ {txt}opened on:  {res}16 Jun 2023, 13:12:11
+
+{com}. do "C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\STATA\Panel Data loop.do"
+{txt}
+{com}. clear
+{txt}
+{com}. cd "C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price"
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+{txt}
+{com}. 
+. // Install Stata package for saving regressions
+. ssc install outreg2
+{txt}checking {hilite:outreg2} consistency and verifying not already installed...
+all files already exist and are up to date.
+
+{com}. 
+. local files : dir . files "*" //Make a list of all the crypto coins in folder.
+{txt}
+{com}. 
+. local first 1 //For either creating or adding to the panel file
+{txt}
+{com}. 
+. // Loop over the list of crypto coins and add them to a primary 'panel' data file. 
+. foreach file of local files {c -(}
+{txt}  2{com}.         display "`file'"
+{txt}  3{com}.         // Remove the file extention to get the coin number and coin.
+.         local coin = substr("`file'", 1, length("`file'") - 4)
+{txt}  4{com}.         // Get the coin number/ID
+.         local coin_id = substr("`coin'", 1, 2)
+{txt}  5{com}.         local coin_id = real("`coin_id'")
+{txt}  6{com}.         
+.         // Prepare the Price data
+.         import delimited "`file'", delimiter(",")
+{txt}  7{com}.         gen double date_dbl = date(date, "YMD")
+{txt}  8{com}.         format date_dbl %d
+{txt}  9{com}.         gen coin = "`coin'"
+{txt} 10{com}.         gen coin_id = "`coin_id'"
+{txt} 11{com}.         cd "C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed"
+{txt} 12{com}.         save "`coin'", replace
+{txt} 13{com}.         clear
+{txt} 14{com}.         
+.         // Prepare Searches data
+.         cd "C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2"
+{txt} 15{com}.         import delimited "`file'", delimiter(",")
+{txt} 16{com}.         drop if v1 == "Category: All categories"
+{txt} 17{com}.         drop if v1 == "Week"
+{txt} 18{com}.         rename v1 date
+{txt} 19{com}.         rename v2 Searches
+{txt} 20{com}.         gen double date_dbl = date(date, "YMD")
+{txt} 21{com}.         format date_dbl %d
+{txt} 22{com}.         cd "C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed"
+{txt} 23{com}.         save "`coin'", replace
+{txt} 24{com}.         
+.         // Merge Price and Searches data
+.         cd "C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed"
+{txt} 25{com}.         merge 1:1 date_dbl using "`coin'", keep(match master) nogenerate
+{txt} 26{com}.         cd "C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches"
+{txt} 27{com}.         save "`coin'", replace
+{txt} 28{com}.         
+.         // Either create the panel data or add the new coin data to it.
+.           if "`first'" == "1" {c -(}
+{txt} 29{com}.             // Create panel data.
+.         save "panel.dta", replace 
+{txt} 30{com}.     {c )-}
+{txt} 31{com}.     else {c -(}
+{txt} 32{com}.         // Add to panel data.
+.                 clear
+{txt} 33{com}.                 use "panel.dta"
+{txt} 34{com}.                 append using "`coin'"
+{txt} 35{com}.                 save "panel.dta", replace
+{txt} 36{com}.     {c )-}
+{txt} 37{com}.         
+.         // Go back to the price directory to add the next coin.
+.         cd "C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price"
+{txt} 38{com}.         clear
+{txt} 39{com}.         local first 0
+{txt} 40{com}. {c )-}
+10 dot.csv
+{res}{text}(7 vars, 1,007 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 10 dot.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 146 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 10 dot.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}             144{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 10 dot.dta saved
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+11 ltc.csv
+{text}(7 vars, 1,825 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 11 ltc.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 263 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 11 ltc.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}             261{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 11 ltc.dta saved
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+12 shib.csv
+{text}(7 vars, 1,026 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 12 shib.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 149 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 12 shib.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}             147{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 12 shib.dta saved
+{p 0 7 2}
+(note: variable
+Searches was 
+str21, now str22 to accommodate using data's values)
+{p_end}
+{p 0 7 2}
+(note: variable
+coin was 
+str6, now str7 to accommodate using data's values)
+{p_end}
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+13 avax.csv
+{text}(7 vars, 974 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 13 avax.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 141 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 13 avax.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}             139{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 13 avax.dta saved
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+14 wbtc.csv
+{text}(7 vars, 1,575 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 14 wbtc.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 227 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 14 wbtc.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}             225{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 14 wbtc.dta saved
+{p 0 7 2}
+(note: variable
+Searches was 
+str22, now str28 to accommodate using data's values)
+{p_end}
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+15 leo.csv
+{text}(7 vars, 1,464 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 15 leo.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 211 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 15 leo.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}             209{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 15 leo.dta saved
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+16 link.csv
+{text}(7 vars, 1,825 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 16 link.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 263 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 16 link.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}             261{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 16 link.dta saved
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+17 atom.csv
+{text}(7 vars, 1,532 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 17 atom.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 221 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 17 atom.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}             219{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 17 atom.dta saved
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+18 uni7083.csv
+{text}(7 vars, 978 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 18 uni7083.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 142 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 18 uni7083.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}             140{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 18 uni7083.dta saved
+{p 0 7 2}
+(note: variable
+coin was 
+str7, now str10 to accommodate using data's values)
+{p_end}
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+19 xmr.csv
+{text}(7 vars, 1,825 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 19 xmr.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 263 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 19 xmr.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}             261{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 19 xmr.dta saved
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+2 eth.csv
+{text}(7 vars, 1,821 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 2 eth.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 263 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 2 eth.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}             261{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 2 eth.dta saved
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+20 okb.csv
+{text}(7 vars, 1,485 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 20 okb.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 214 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 20 okb.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}             212{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 20 okb.dta saved
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+21 etc.csv
+{text}(7 vars, 1,825 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 21 etc.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 263 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 21 etc.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}             261{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 21 etc.dta saved
+{p 0 7 2}
+(note: variable
+Searches was 
+str28, now str29 to accommodate using data's values)
+{p_end}
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+22 ton11419.csv
+{text}(7 vars, 635 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 22 ton11419.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 93 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 22 ton11419.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}              91{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 22 ton11419.dta saved
+{p 0 7 2}
+(note: variable
+coin was 
+str10, now str11 to accommodate using data's values)
+{p_end}
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+23 xlm.csv
+{text}(7 vars, 1,829 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 23 xlm.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 263 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 23 xlm.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}             261{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 23 xlm.dta saved
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+24 bch.csv
+{text}(7 vars, 1,825 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 24 bch.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 263 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 24 bch.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}             261{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 24 bch.dta saved
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+25 icp.csv
+{text}(7 vars, 744 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 25 icp.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 108 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 25 icp.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}             106{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 25 icp.dta saved
+{p 0 7 2}
+(note: variable
+Searches was 
+str29, now str30 to accommodate using data's values)
+{p_end}
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+26 fil.csv
+{text}(7 vars, 1,825 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 26 fil.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 263 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 26 fil.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}             261{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 26 fil.dta saved
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+27 ldo.csv
+{text}(7 vars, 859 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 27 ldo.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 126 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 27 ldo.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               1
+{txt}{col 9}from master{col 30}{res}               1{txt}  
+{col 9}from using{col 30}{res}               0{txt}  
+
+{col 5}matched{col 30}{res}             123{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 27 ldo.dta saved
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+28 hbar.csv
+{text}(7 vars, 1,345 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 28 hbar.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 90 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 28 hbar.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}              88{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 28 hbar.dta saved
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+3 bnb.csv
+{text}(7 vars, 1,825 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 3 bnb.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 263 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 3 bnb.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}             261{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 3 bnb.dta saved
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+30 cro.csv
+{text}(7 vars, 1,622 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 30 cro.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 234 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 30 cro.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}             232{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 30 cro.dta saved
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+31 near.csv
+{text}(7 vars, 952 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 31 near.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 138 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 31 near.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}             136{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 31 near.dta saved
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+33 vet.csv
+{text}(7 vars, 1,755 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 33 vet.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 253 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 33 vet.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}             251{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 33 vet.dta saved
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+34 qnt.csv
+{text}(7 vars, 1,748 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 34 qnt.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 252 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 34 qnt.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}             250{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 34 qnt.dta saved
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+35 ape18876.csv
+{text}(7 vars, 432 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 35 ape18876.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 64 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 35 ape18876.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}              62{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 35 ape18876.dta saved
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+36 algo.csv
+{text}(7 vars, 1,433 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 36 algo.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 207 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 36 algo.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}             205{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 36 algo.dta saved
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+37 grt6719.csv
+{text}(7 vars, 887 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 37 grt6719.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 129 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 37 grt6719.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}             127{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 37 grt6719.dta saved
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+38 rndr.csv
+{text}(7 vars, 1,077 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 38 rndr.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 156 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 38 rndr.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}             154{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 38 rndr.dta saved
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+39 bit11221.csv
+{text}(7 vars, 644 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 39 bit11221.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 94 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 39 bit11221.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}              92{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 39 bit11221.dta saved
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+4 xrp.csv
+{text}(7 vars, 1,825 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 4 xrp.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 263 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 4 xrp.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}             261{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 4 xrp.dta saved
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+40 sand.csv
+{text}(7 vars, 1,013 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 40 sand.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 147 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 40 sand.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}             145{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 40 sand.dta saved
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+41 ftm.csv
+{text}(7 vars, 1,667 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 41 ftm.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 240 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 41 ftm.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}             238{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 41 ftm.dta saved
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+42 aave.csv
+{text}(7 vars, 964 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 42 aave.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 244 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 42 aave.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}             104
+{txt}{col 9}from master{col 30}{res}             104{txt}  
+{col 9}from using{col 30}{res}               0{txt}  
+
+{col 5}matched{col 30}{res}             138{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 42 aave.dta saved
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+43 egld.csv
+{text}(7 vars, 992 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 43 egld.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 144 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 43 egld.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}             142{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 43 egld.dta saved
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+44 eos.csv
+{text}(7 vars, 1,825 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 44 eos.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 263 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 44 eos.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}             261{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 44 eos.dta saved
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+45 rpl.csv
+{text}(7 vars, 1,689 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 45 rpl.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 243 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 45 rpl.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}             241{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 45 rpl.dta saved
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+46 cfx.csv
+{text}(7 vars, 924 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 46 cfx.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 134 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 46 cfx.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}             132{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 46 cfx.dta saved
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+47 mana.csv
+{text}(7 vars, 1,825 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 47 mana.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 263 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 47 mana.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}             261{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 47 mana.dta saved
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+48 theta.csv
+{text}(7 vars, 1,825 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 48 theta.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 263 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 48 theta.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}             261{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 48 theta.dta saved
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+49 xtz.csv
+{text}(7 vars, 1,825 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 49 xtz.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 263 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 49 xtz.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}             261{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 49 xtz.dta saved
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+5 ada.csv
+{text}(7 vars, 1,825 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 5 ada.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 263 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 5 ada.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}             261{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 5 ada.dta saved
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+50 stx4847.csv
+{text}(7 vars, 1,303 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 50 stx4847.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 188 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 50 stx4847.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}             186{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 50 stx4847.dta saved
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+51 axs.csv
+{text}(7 vars, 931 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 51 axs.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 135 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 51 axs.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}             133{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 51 axs.dta saved
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+52 flow.csv
+{text}(7 vars, 847 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 52 flow.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 123 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 52 flow.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}             121{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 52 flow.dta saved
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+53 kcs.csv
+{text}(7 vars, 1,825 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 53 kcs.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 263 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 53 kcs.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}             261{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 53 kcs.dta saved
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+6 doge.csv
+{text}(7 vars, 1,825 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 6 doge.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 263 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 6 doge.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}             261{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 6 doge.dta saved
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+7 matic.csv
+{text}(7 vars, 1,487 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 7 matic.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 215 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 7 matic.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}             213{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 7 matic.dta saved
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+8 sol.csv
+{text}(7 vars, 1,139 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 8 sol.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 165 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 8 sol.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}             163{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 8 sol.dta saved
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+9 trx.csv
+{text}(7 vars, 1,825 obs)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+{txt}file 9 trx.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends 2
+{text}(2 vars, 263 obs)
+(1 observation deleted)
+(1 observation deleted)
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Trends-processed
+{txt}file 9 trx.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-processed
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}             261{txt}  
+{col 5}{hline 41}
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}file 9 trx.dta saved
+file panel.dta saved
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price
+{txt}
+{com}. 
+. // Open the panel data.
+. cd "C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches"
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}
+{com}. use panel
+{txt}
+{com}. 
+. // Slight cleanup.
+. destring coin_id, replace
+{txt}coin_id: all characters numeric; {res}replaced {txt}as {res}byte
+{txt}(105 missing values generated)
+{res}{txt}
+{com}. // Some Google Trends data is recorded as <1 in a string, this is replaced by 0
+. replace Searches = "0" if Searches == "<1" 
+{txt}(152 real changes made)
+
+{com}. destring Searches, replace
+{txt}Searches: all characters numeric; {res}replaced {txt}as {res}byte
+{txt}
+{com}. 
+. // Set that it is a panel.
+. sort coin_id date_dbl
+{txt}
+{com}. xtset coin_id date_dbl, delta(7)
+{res}{txt}{col 8}panel variable:  {res}coin_id (unbalanced)
+{txt}{col 9}time variable:  {res}{col 25}date_dbl, 27may2018 to 21may2023, but with a gap
+{txt}{col 17}delta:  {res}7 days
+{txt}
+{com}. sort coin_id date_dbl
+{txt}
+{com}. 
+. // Do the panel calculations for delta GSV, returns, and volatility.
+. gen ΔGSV = Searches - L1.Searches
+{txt}(52 missing values generated)
+
+{com}. gen returns = ln(close) - ln(L1.close)
+{txt}(192 missing values generated)
+
+{com}. gen volatility = abs(returns)
+{txt}(192 missing values generated)
+
+{com}. save panel, replace
+{txt}file panel.dta saved
+
+{com}. 
+. 
+. // Clean up control variable data.
+. clear
+{txt}
+{com}. cd "C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Control"
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Control
+{txt}
+{com}. 
+. //VIX (Uncertainty in general financial markets)
+. import delimited "^VIX.csv", delimiter(",")
+{res}{text}(7 vars, 1,300 obs)
+
+{com}. drop v2 v3 v4 v6 v7 // Drop unneeded columns
+{txt}
+{com}. rename v1 date
+{res}{txt}
+{com}. rename v5 close 
+{res}{txt}
+{com}. // Only keep the closing values.
+. drop if date == "Date" 
+{txt}(1 observation deleted)
+
+{com}. // Drop the observation if the value is null.
+. drop if close == "null"
+{txt}(45 observations deleted)
+
+{com}. destring close, replace
+{txt}close: all characters numeric; {res}replaced {txt}as {res}double
+{txt}
+{com}. // Make the date into a STATA date format.
+. gen double date_dbl = date(date, "YMD") 
+{txt}
+{com}. format date_dbl %d
+{txt}
+{com}. // As the VIX data is only for weekdays, but the search data is for every sunday of the week, the last value of VIX for a friday needs to be used. (The closing value of friday for the week)
+. // Associates a number with every day of the week. 1=monday, 5=friday.
+. gen day_of_week = dow(date_dbl) 
+{txt}
+{com}. // Only keeps the friday data. 
+. drop if day_of_week < 5 
+{txt}(1,003 observations deleted)
+
+{com}. // Generates the date for the sunday following each friday.
+. gen date_sunday = date_dbl + 2
+{txt}
+{com}. format date_sunday %td
+{txt}
+{com}. // No loger needed.
+. drop day_of_week date 
+{txt}
+{com}. rename date_dbl date_VIX_last_friday
+{res}{txt}
+{com}. // For matching to the panel data purposes. 
+. rename date_sunday date_dbl 
+{res}{txt}
+{com}. // Set delta of time so that it is possible to calculate the delta_VIX.
+. tsset date_dbl, delta(7)
+{res}{txt}{col 9}time variable:  {res}{col 25}date_dbl, 03jun2018 to 21may2023, but with gaps
+{txt}{col 17}delta:  {res}7 days
+{txt}
+{com}. // Lag of 1 (L1) becuase weekly search data. (Every sunday is seperated by a week)
+. gen ΔVIX = ln(close) - ln(L1.close)
+{txt}(9 missing values generated)
+
+{com}. rename close VIX
+{res}{txt}
+{com}. save vix, replace
+{txt}file vix.dta saved
+
+{com}. clear
+{txt}
+{com}. 
+. //EPU_US (Uncertainty for economic policy)
+. import excel "EPU US daily.xls", sheet("FRED Graph")
+{res}{text}(2 vars, 1,847 obs)
+
+{com}. rename A date
+{res}{txt}
+{com}. rename B EPU_US
+{res}{txt}
+{com}. drop if date == "FRED Graph Observations"
+{txt}(1 observation deleted)
+
+{com}. drop if date == ""
+{txt}(2 observations deleted)
+
+{com}. drop if date == "Federal Reserve Economic Data"
+{txt}(1 observation deleted)
+
+{com}. drop if date == "Link: https://fred.stlouisfed.org"
+{txt}(1 observation deleted)
+
+{com}. drop if date == "Help: https://fredhelp.stlouisfed.org"
+{txt}(1 observation deleted)
+
+{com}. drop if date == "Economic Research Division"
+{txt}(1 observation deleted)
+
+{com}. drop if date == "Federal Reserve Bank of St. Louis"
+{txt}(1 observation deleted)
+
+{com}. drop if date == "USEPUINDXD"
+{txt}(1 observation deleted)
+
+{com}. drop if date == "Frequency: Daily, 7-Day"
+{txt}(1 observation deleted)
+
+{com}. drop if date == "observation_date"
+{txt}(1 observation deleted)
+
+{com}. destring EPU_US, replace
+{txt}EPU_US: all characters numeric; {res}replaced {txt}as {res}double
+{txt}
+{com}. // Make the date into a STATA date format.
+. gen double date_dbl = date(date, "DMY") 
+{txt}
+{com}. format date_dbl %d
+{txt}
+{com}. // Set delta of time so that it is possible to calculate the delta_EPU.
+. tsset date_dbl, delta(1)
+{res}{txt}{col 9}time variable:  {res}{col 25}date_dbl, 27may2018 to 05jun2023
+{txt}{col 17}delta:  {res}1 day
+{txt}
+{com}. // Lag of 7 (L7) becuase of weekly search data.
+. gen ΔEPU_US = ln(EPU_US) - ln(L7.EPU_US)
+{txt}(7 missing values generated)
+
+{com}. drop date
+{txt}
+{com}. save epu_us, replace
+{txt}file epu_us.dta saved
+
+{com}. clear
+{txt}
+{com}. 
+. // ADS (Aruoba-Diebold-Scotti Business Conditions Index)
+. import excel "ADS_Index_Most_Current_Vintage from Federal Reserve Bank Philidepia.xlsx", sheet("Sheet1")
+{res}{text}(2 vars, 23,103 obs)
+
+{com}. rename A date
+{res}{txt}
+{com}. rename B ADS
+{res}{txt}
+{com}. drop if date == "" 
+{txt}(1 observation deleted)
+
+{com}. // Make the date into a STATA date format.
+. gen double date_dbl = date(date, "YMD") 
+{txt}
+{com}. format date_dbl %d
+{txt}
+{com}. destring ADS, replace
+{txt}ADS: all characters numeric; {res}replaced {txt}as {res}double
+{txt}
+{com}. // Set delta of time so that it is possible to calculate the delta_ABS.
+. tsset date_dbl, delta(1)
+{res}{txt}{col 9}time variable:  {res}{col 25}date_dbl, 01mar1960 to 31may2023
+{txt}{col 17}delta:  {res}1 day
+{txt}
+{com}. // Lag of 7 (L7) becuase of weekly search data.
+. gen ΔADS = ADS - L7.ADS
+{txt}(7 missing values generated)
+
+{com}. drop date
+{txt}
+{com}. save ads, replace 
+{txt}file ads.dta saved
+
+{com}. clear
+{txt}
+{com}. 
+. // TERM (Term premium between 2-year and 10-year Treasury yields)
+. import excel "TERM-T10Y2Y.xls", sheet("FRED Graph")
+{res}{text}(2 vars, 1,316 obs)
+
+{com}. rename A date
+{res}{txt}
+{com}. rename B TERM_T10Y2Y
+{res}{txt}
+{com}. drop if date == "FRED Graph Observations"
+{txt}(1 observation deleted)
+
+{com}. drop if date == ""
+{txt}(2 observations deleted)
+
+{com}. drop if date == "Federal Reserve Economic Data"
+{txt}(1 observation deleted)
+
+{com}. drop if date == "Link: https://fred.stlouisfed.org"
+{txt}(1 observation deleted)
+
+{com}. drop if date == "Help: https://fredhelp.stlouisfed.org"
+{txt}(1 observation deleted)
+
+{com}. drop if date == "Economic Research Division"
+{txt}(1 observation deleted)
+
+{com}. drop if date == "Federal Reserve Bank of St. Louis"
+{txt}(1 observation deleted)
+
+{com}. drop if date == "T10Y2Y"
+{txt}(1 observation deleted)
+
+{com}. drop if date == "Frequency: Daily"
+{txt}(1 observation deleted)
+
+{com}. drop if date == "observation_date"
+{txt}(1 observation deleted)
+
+{com}. // Make the date into a STATA date format.
+. gen double date_dbl = date(date, "DMY") 
+{txt}
+{com}. format date_dbl %d
+{txt}
+{com}. destring TERM_T10Y2Y, replace
+{txt}TERM_T10Y2Y: all characters numeric; {res}replaced {txt}as {res}double
+{txt}
+{com}. // As the TERM data is only for weekdays, but the search data is for every sunday of the week, the last value of TERM for a friday needs to be used. (The closing value of friday for the week) The same as was done for VIX.
+. // Associates a number with every day of the week. 1=monday, 5=friday. 
+. gen day_of_week = dow(date_dbl) 
+{txt}
+{com}. // Only keeps the friday data. 
+. drop if day_of_week < 5 
+{txt}(1,044 observations deleted)
+
+{com}. // Generates the date for the sunday following each friday.
+. gen date_sunday = date_dbl + 2
+{txt}
+{com}. format date_sunday %td
+{txt}
+{com}. // No loger needed.
+. drop day_of_week date 
+{txt}
+{com}. rename date_dbl date_TERM_last_friday
+{res}{txt}
+{com}. // For matching to the panel data purposes. 
+. rename date_sunday date_dbl 
+{res}{txt}
+{com}. // Set delta of time so that it is possible to calculate the delta_VIX.
+. tsset date_dbl, delta(7)
+{res}{txt}{col 9}time variable:  {res}{col 25}date_dbl, 10jun2018 to 04jun2023
+{txt}{col 17}delta:  {res}7 days
+{txt}
+{com}. // Lag of 1 (L1) becuase weekly search data. (Every sunday is seperated by a week)
+. gen ΔTERM = TERM_T10Y2Y - L1.TERM_T10Y2Y
+{txt}(1 missing value generated)
+
+{com}. save term, replace
+{txt}file term.dta saved
+
+{com}. clear
+{txt}
+{com}. 
+. // Add control variables via m:1 to main panel data. 
+. cd "C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches"
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Price-Searches
+{txt}
+{com}. use panel
+{txt}
+{com}. cd "C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Control"
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Control
+{txt}
+{com}. merge m:1 date_dbl using "vix.dta", force
+{res}
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}             389
+{txt}{col 9}from master{col 30}{res}             389{txt}  (_merge==1)
+{col 9}from using{col 30}{res}               0{txt}  (_merge==2)
+
+{col 5}matched{col 30}{res}           9,618{txt}  (_merge==3)
+{col 5}{hline 41}
+
+{com}. drop _merge
+{txt}
+{com}. merge m:1 date_dbl using "epu_us.dta", force
+{res}
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}           1,575
+{txt}{col 9}from master{col 30}{res}               0{txt}  (_merge==1)
+{col 9}from using{col 30}{res}           1,575{txt}  (_merge==2)
+
+{col 5}matched{col 30}{res}          10,007{txt}  (_merge==3)
+{col 5}{hline 41}
+
+{com}. drop _merge
+{txt}
+{com}. merge m:1 date_dbl using "ads.dta", force
+{res}
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}          21,276
+{txt}{col 9}from master{col 30}{res}               5{txt}  (_merge==1)
+{col 9}from using{col 30}{res}          21,271{txt}  (_merge==2)
+
+{col 5}matched{col 30}{res}          11,577{txt}  (_merge==3)
+{col 5}{hline 41}
+
+{com}. drop _merge
+{txt}
+{com}. merge m:1 date_dbl using "term.dta", force
+{res}
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}          22,880
+{txt}{col 9}from master{col 30}{res}          22,880{txt}  (_merge==1)
+{col 9}from using{col 30}{res}               0{txt}  (_merge==2)
+
+{col 5}matched{col 30}{res}           9,973{txt}  (_merge==3)
+{col 5}{hline 41}
+
+{com}. drop _merge
+{txt}
+{com}. 
+. drop if coin == ""
+{txt}(22,951 observations deleted)
+
+{com}. save panel, replace
+{txt}file panel.dta saved
+
+{com}. 
+. 
+. // Summary Statisics
+. cd "C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Outputs"
+{res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Outputs
+{txt}
+{com}. // P5
+. summarize returns volatility ΔGSV ΔVIX ΔEPU_US ΔADS ΔTERM if coin_id < 7
+
+{txt}    Variable {c |}        Obs        Mean    Std. Dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 5}returns {c |}{res}      1,300    .0059416    .1549044  -.7610299   1.457007
+{txt}{space 2}volatility {c |}{res}      1,300    .0982915    .1198417          0   1.457007
+{txt}{space 8}ΔGSV {c |}{res}      1,300    .0015385    6.746025        -53         74
+{txt}{space 8}ΔVIX {c |}{res}      1,210    .0031448    .1553728  -.4952963   .8537175
+{txt}{space 5}ΔEPU_US {c |}{res}      1,300    .0057371    .5659615  -2.167168   3.217492
+{txt}{hline 13}{c +}{hline 57}
+{space 8}ΔADS {c |}{res}      1,305    .0020119    1.146839   -6.75544    8.43982
+{txt}{space 7}ΔTERM {c |}{res}      1,290   -.0039147    .1540625       -.82        .99
+{txt}
+{com}. // P25
+. summarize returns volatility ΔGSV ΔVIX ΔEPU_US ΔADS ΔTERM if coin_id < 27
+
+{txt}    Variable {c |}        Obs        Mean    Std. Dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 5}returns {c |}{res}      5,339    .0041607    .1626281  -1.070225   2.079442
+{txt}{space 2}volatility {c |}{res}      5,339    .1060369    .1233664          0   2.079442
+{txt}{space 8}ΔGSV {c |}{res}      5,376   -.0104167    7.665512        -74         92
+{txt}{space 8}ΔVIX {c |}{res}      5,003    .0023838     .153683  -.4952963   .8537175
+{txt}{space 5}ΔEPU_US {c |}{res}      5,388    .0044284    .5644964  -2.167168   3.217492
+{txt}{hline 13}{c +}{hline 57}
+{space 8}ΔADS {c |}{res}      5,401    .0051505    1.090299   -6.75544    8.43982
+{txt}{space 7}ΔTERM {c |}{res}      5,362   -.0048191    .1621509       -.82        .99
+{txt}
+{com}. //P50
+. summarize returns volatility ΔGSV ΔVIX ΔEPU_US ΔADS ΔTERM
+
+{txt}    Variable {c |}        Obs        Mean    Std. Dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 5}returns {c |}{res}      9,815    .0041057    .1778693  -1.070225   2.079442
+{txt}{space 2}volatility {c |}{res}      9,815    .1184289    .1327686          0   2.079442
+{txt}{space 8}ΔGSV {c |}{res}      9,852    .0051766    8.394839        -75         92
+{txt}{space 8}ΔVIX {c |}{res}      9,172    .0018616    .1529376  -.4952963   .8537175
+{txt}{space 5}ΔEPU_US {c |}{res}      9,884     .003897    .5700405  -2.167168   3.217492
+{txt}{hline 13}{c +}{hline 57}
+{space 8}ΔADS {c |}{res}      9,902    .0019389    1.034867   -6.75544    8.43982
+{txt}{space 7}ΔTERM {c |}{res}      9,848    -.005459    .1646815       -.82        .99
+{txt}
+{com}. 
+. // Correlations
+. pwcorr ΔGSV ΔVIX ΔEPU_US ΔADS ΔTERM
+
+             {txt}{c |}     ΔGSV     ΔVIX  ΔEPU_US     ΔADS    ΔTERM
+{hline 13}{c +}{hline 45}
+        ΔGSV {c |} {res}  1.0000 
+        {txt}ΔVIX {c |} {res} -0.0319   1.0000 
+     {txt}ΔEPU_US {c |} {res}  0.0144   0.0051   1.0000 
+        {txt}ΔADS {c |} {res}  0.0044  -0.1173  -0.0428   1.0000 
+       {txt}ΔTERM {c |} {res}  0.0243  -0.0678   0.0681   0.0154   1.0000 
+{txt}
+{com}. 
+. // Run the panel regressions 
+. sort coin_id date_dbl
+{txt}
+{com}. 
+. // Panel of 5 highest market-cap altcoins
+. 
+. //Univariate
+. xtreg returns ΔGSV if inlist(coin_id, 2,3,4,5,6)
+{res}
+{txt}Random-effects GLS regression                   Number of obs     = {res}     1,300
+{txt}Group variable: {res}coin_id                         {txt}Number of groups  = {res}         5
+
+{txt}R-sq:                                           Obs per group:
+     within  = {res}0.0587                                         {txt}min = {res}       260
+{txt}     between = {res}0.6211                                         {txt}avg = {res}     260.0
+{txt}     overall = {res}0.0586                                         {txt}max = {res}       260
+
+                                                {txt}Wald chi2({res}1{txt})      =  {res}    80.73
+{txt}corr(u_i, X)   = {res}0{txt} (assumed)                    Prob > chi2       =     {res}0.0000
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}     returns{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      z{col 46}   P>|z|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 8}ΔGSV {c |}{col 14}{res}{space 2} .0055564{col 26}{space 2} .0006184{col 37}{space 1}    8.98{col 46}{space 3}0.000{col 54}{space 4} .0043443{col 67}{space 3} .0067685
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .0059331{col 26}{space 2} .0041702{col 37}{space 1}    1.42{col 46}{space 3}0.155{col 54}{space 4}-.0022404{col 67}{space 3} .0141065
+{txt}{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+     sigma_u {c |} {res}         0
+     {txt}sigma_e {c |} {res} .15049593
+         {txt}rho {c |} {res}         0{txt}   (fraction of variance due to u_i)
+{hline 13}{c BT}{hline 64}
+
+{com}. // Creating a table to save the univariate regressions for returns
+. outreg2 using uni_returns, word replace ctitle(P5)
+{txt}{stata `"shellout using `"uni_returns.rtf"'"':uni_returns.rtf}
+{browse `"C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Outputs"' :dir}{com} : {txt}{stata `"seeout using "uni_returns.txt""':seeout}
+
+{com}. xtreg volatility ΔGSV if inlist(coin_id, 2,3,4,5,6)
+{res}
+{txt}Random-effects GLS regression                   Number of obs     = {res}     1,300
+{txt}Group variable: {res}coin_id                         {txt}Number of groups  = {res}         5
+
+{txt}R-sq:                                           Obs per group:
+     within  = {res}0.0009                                         {txt}min = {res}       260
+{txt}     between = {res}0.0877                                         {txt}avg = {res}     260.0
+{txt}     overall = {res}0.0009                                         {txt}max = {res}       260
+
+                                                {txt}Wald chi2({res}1{txt})      =  {res}     1.14
+{txt}corr(u_i, X)   = {res}0{txt} (assumed)                    Prob > chi2       =     {res}0.2855
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}  volatility{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      z{col 46}   P>|z|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 8}ΔGSV {c |}{col 14}{res}{space 2} .0005264{col 26}{space 2} .0004928{col 37}{space 1}    1.07{col 46}{space 3}0.285{col 54}{space 4}-.0004396{col 67}{space 3} .0014924
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .0982907{col 26}{space 2} .0033933{col 37}{space 1}   28.97{col 46}{space 3}0.000{col 54}{space 4} .0916399{col 67}{space 3} .1049415
+{txt}{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+     sigma_u {c |} {res} .00153221
+     {txt}sigma_e {c |} {res} .11986181
+         {txt}rho {c |} {res} .00016338{txt}   (fraction of variance due to u_i)
+{hline 13}{c BT}{hline 64}
+
+{com}. // Creating a table to save the univariate regressions for volatility
+. outreg2 using uni_volatility, word replace ctitle(P5)
+{txt}{stata `"shellout using `"uni_volatility.rtf"'"':uni_volatility.rtf}
+{browse `"C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Outputs"' :dir}{com} : {txt}{stata `"seeout using "uni_volatility.txt""':seeout}
+
+{com}. 
+. // Full
+. xtreg returns ΔGSV ΔVIX ΔEPU_US ΔADS ΔTERM L1.returns if inlist(coin_id, 2,3,4,5,6)
+{res}
+{txt}Random-effects GLS regression                   Number of obs     = {res}     1,205
+{txt}Group variable: {res}coin_id                         {txt}Number of groups  = {res}         5
+
+{txt}R-sq:                                           Obs per group:
+     within  = {res}0.1100                                         {txt}min = {res}       241
+{txt}     between = {res}0.0251                                         {txt}avg = {res}     241.0
+{txt}     overall = {res}0.1099                                         {txt}max = {res}       241
+
+                                                {txt}Wald chi2({res}6{txt})      =  {res}   147.93
+{txt}corr(u_i, X)   = {res}0{txt} (assumed)                    Prob > chi2       =     {res}0.0000
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}     returns{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      z{col 46}   P>|z|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 8}ΔGSV {c |}{col 14}{res}{space 2} .0059522{col 26}{space 2} .0006728{col 37}{space 1}    8.85{col 46}{space 3}0.000{col 54}{space 4} .0046336{col 67}{space 3} .0072707
+{txt}{space 8}ΔVIX {c |}{col 14}{res}{space 2}-.1949761{col 26}{space 2} .0268738{col 37}{space 1}   -7.26{col 46}{space 3}0.000{col 54}{space 4}-.2476477{col 67}{space 3}-.1423045
+{txt}{space 5}ΔEPU_US {c |}{col 14}{res}{space 2} .0008239{col 26}{space 2} .0074059{col 37}{space 1}    0.11{col 46}{space 3}0.911{col 54}{space 4}-.0136913{col 67}{space 3} .0153391
+{txt}{space 8}ΔADS {c |}{col 14}{res}{space 2} .0036905{col 26}{space 2} .0035764{col 37}{space 1}    1.03{col 46}{space 3}0.302{col 54}{space 4} -.003319{col 67}{space 3} .0107001
+{txt}{space 7}ΔTERM {c |}{col 14}{res}{space 2}-.0726338{col 26}{space 2} .0430366{col 37}{space 1}   -1.69{col 46}{space 3}0.091{col 54}{space 4} -.156984{col 67}{space 3} .0117164
+{txt}{space 12} {c |}
+{space 5}returns {c |}
+{space 9}L1. {c |}{col 14}{res}{space 2} .1069976{col 26}{space 2} .0272856{col 37}{space 1}    3.92{col 46}{space 3}0.000{col 54}{space 4} .0535189{col 67}{space 3} .1604763
+{txt}{space 12} {c |}
+{space 7}_cons {c |}{col 14}{res}{space 2}  .002991{col 26}{space 2} .0041456{col 37}{space 1}    0.72{col 46}{space 3}0.471{col 54}{space 4}-.0051343{col 67}{space 3} .0111162
+{txt}{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+     sigma_u {c |} {res}         0
+     {txt}sigma_e {c |} {res} .14365696
+         {txt}rho {c |} {res}         0{txt}   (fraction of variance due to u_i)
+{hline 13}{c BT}{hline 64}
+
+{com}. outreg2 using returns, word replace ctitle(P5)
+{txt}{stata `"shellout using `"returns.rtf"'"':returns.rtf}
+{browse `"C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Outputs"' :dir}{com} : {txt}{stata `"seeout using "returns.txt""':seeout}
+
+{com}. xtreg volatility ΔGSV ΔVIX ΔEPU_US ΔADS ΔTERM L1.volatility if inlist(coin_id, 2,3,4,5,6)
+{res}
+{txt}Random-effects GLS regression                   Number of obs     = {res}     1,205
+{txt}Group variable: {res}coin_id                         {txt}Number of groups  = {res}         5
+
+{txt}R-sq:                                           Obs per group:
+     within  = {res}0.0511                                         {txt}min = {res}       241
+{txt}     between = {res}0.9664                                         {txt}avg = {res}     241.0
+{txt}     overall = {res}0.0518                                         {txt}max = {res}       241
+
+                                                {txt}Wald chi2({res}6{txt})      =  {res}    65.46
+{txt}corr(u_i, X)   = {res}0{txt} (assumed)                    Prob > chi2       =     {res}0.0000
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}  volatility{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      z{col 46}   P>|z|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 8}ΔGSV {c |}{col 14}{res}{space 2} .0004826{col 26}{space 2} .0005441{col 37}{space 1}    0.89{col 46}{space 3}0.375{col 54}{space 4}-.0005837{col 67}{space 3}  .001549
+{txt}{space 8}ΔVIX {c |}{col 14}{res}{space 2} .0979024{col 26}{space 2} .0215169{col 37}{space 1}    4.55{col 46}{space 3}0.000{col 54}{space 4} .0557299{col 67}{space 3} .1400748
+{txt}{space 5}ΔEPU_US {c |}{col 14}{res}{space 2} -.009459{col 26}{space 2}  .005878{col 37}{space 1}   -1.61{col 46}{space 3}0.108{col 54}{space 4}-.0209796{col 67}{space 3} .0020617
+{txt}{space 8}ΔADS {c |}{col 14}{res}{space 2}-.0048517{col 26}{space 2} .0028459{col 37}{space 1}   -1.70{col 46}{space 3}0.088{col 54}{space 4}-.0104296{col 67}{space 3} .0007262
+{txt}{space 7}ΔTERM {c |}{col 14}{res}{space 2} .1035548{col 26}{space 2} .0342389{col 37}{space 1}    3.02{col 46}{space 3}0.002{col 54}{space 4} .0364478{col 67}{space 3} .1706619
+{txt}{space 12} {c |}
+{space 2}volatility {c |}
+{space 9}L1. {c |}{col 14}{res}{space 2} .1640823{col 26}{space 2} .0283909{col 37}{space 1}    5.78{col 46}{space 3}0.000{col 54}{space 4} .1084372{col 67}{space 3} .2197274
+{txt}{space 12} {c |}
+{space 7}_cons {c |}{col 14}{res}{space 2} .0804472{col 26}{space 2} .0043147{col 37}{space 1}   18.64{col 46}{space 3}0.000{col 54}{space 4} .0719905{col 67}{space 3} .0889039
+{txt}{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+     sigma_u {c |} {res}         0
+     {txt}sigma_e {c |} {res} .11453201
+         {txt}rho {c |} {res}         0{txt}   (fraction of variance due to u_i)
+{hline 13}{c BT}{hline 64}
+
+{com}. outreg2 using volatility, word replace ctitle(P5)
+{txt}{stata `"shellout using `"volatility.rtf"'"':volatility.rtf}
+{browse `"C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Outputs"' :dir}{com} : {txt}{stata `"seeout using "volatility.txt""':seeout}
+
+{com}.  
+. // Panel of 25 highest market-cap altcoins
+. //Univariate
+. xtreg returns ΔGSV if inlist(coin_id, 2, 3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26)
+{res}
+{txt}Random-effects GLS regression                   Number of obs     = {res}     5,339
+{txt}Group variable: {res}coin_id                         {txt}Number of groups  = {res}        25
+
+{txt}R-sq:                                           Obs per group:
+     within  = {res}0.0252                                         {txt}min = {res}        90
+{txt}     between = {res}0.5767                                         {txt}avg = {res}     213.6
+{txt}     overall = {res}0.0252                                         {txt}max = {res}       260
+
+                                                {txt}Wald chi2({res}1{txt})      =  {res}   138.20
+{txt}corr(u_i, X)   = {res}0{txt} (assumed)                    Prob > chi2       =     {res}0.0000
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}     returns{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      z{col 46}   P>|z|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 8}ΔGSV {c |}{col 14}{res}{space 2} .0033591{col 26}{space 2} .0002857{col 37}{space 1}   11.76{col 46}{space 3}0.000{col 54}{space 4} .0027991{col 67}{space 3} .0039191
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .0041972{col 26}{space 2} .0021976{col 37}{space 1}    1.91{col 46}{space 3}0.056{col 54}{space 4}-.0001101{col 67}{space 3} .0085044
+{txt}{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+     sigma_u {c |} {res}         0
+     {txt}sigma_e {c |} {res} .16065652
+         {txt}rho {c |} {res}         0{txt}   (fraction of variance due to u_i)
+{hline 13}{c BT}{hline 64}
+
+{com}. outreg2 using uni_returns, word append ctitle(P25)
+{txt}{stata `"shellout using `"uni_returns.rtf"'"':uni_returns.rtf}
+{browse `"C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Outputs"' :dir}{com} : {txt}{stata `"seeout using "uni_returns.txt""':seeout}
+
+{com}. xtreg volatility ΔGSV if inlist(coin_id, 2, 3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26)
+{res}
+{txt}Random-effects GLS regression                   Number of obs     = {res}     5,339
+{txt}Group variable: {res}coin_id                         {txt}Number of groups  = {res}        25
+
+{txt}R-sq:                                           Obs per group:
+     within  = {res}0.0000                                         {txt}min = {res}        90
+{txt}     between = {res}0.0028                                         {txt}avg = {res}     213.6
+{txt}     overall = {res}0.0000                                         {txt}max = {res}       260
+
+                                                {txt}Wald chi2({res}1{txt})      =  {res}     0.11
+{txt}corr(u_i, X)   = {res}0{txt} (assumed)                    Prob > chi2       =     {res}0.7391
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}  volatility{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      z{col 46}   P>|z|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 8}ΔGSV {c |}{col 14}{res}{space 2}-.0000721{col 26}{space 2} .0002164{col 37}{space 1}   -0.33{col 46}{space 3}0.739{col 54}{space 4}-.0004961{col 67}{space 3}  .000352
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .1086744{col 26}{space 2} .0049018{col 37}{space 1}   22.17{col 46}{space 3}0.000{col 54}{space 4} .0990671{col 67}{space 3} .1182817
+{txt}{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+     sigma_u {c |} {res} .02291152
+     {txt}sigma_e {c |} {res} .12159452
+         {txt}rho {c |} {res} .03428689{txt}   (fraction of variance due to u_i)
+{hline 13}{c BT}{hline 64}
+
+{com}. outreg2 using uni_volatility, word append ctitle(P25)
+{txt}{stata `"shellout using `"uni_volatility.rtf"'"':uni_volatility.rtf}
+{browse `"C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Outputs"' :dir}{com} : {txt}{stata `"seeout using "uni_volatility.txt""':seeout}
+
+{com}. 
+. // Full
+. xtreg returns ΔGSV ΔVIX ΔEPU_US ΔADS ΔTERM L1.returns if inlist(coin_id, 2, 3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26)
+{res}
+{txt}Random-effects GLS regression                   Number of obs     = {res}     4,937
+{txt}Group variable: {res}coin_id                         {txt}Number of groups  = {res}        25
+
+{txt}R-sq:                                           Obs per group:
+     within  = {res}0.0756                                         {txt}min = {res}        83
+{txt}     between = {res}0.3444                                         {txt}avg = {res}     197.5
+{txt}     overall = {res}0.0757                                         {txt}max = {res}       241
+
+                                                {txt}Wald chi2({res}6{txt})      =  {res}   403.99
+{txt}corr(u_i, X)   = {res}0{txt} (assumed)                    Prob > chi2       =     {res}0.0000
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}     returns{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      z{col 46}   P>|z|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 8}ΔGSV {c |}{col 14}{res}{space 2} .0034598{col 26}{space 2} .0003024{col 37}{space 1}   11.44{col 46}{space 3}0.000{col 54}{space 4} .0028672{col 67}{space 3} .0040525
+{txt}{space 8}ΔVIX {c |}{col 14}{res}{space 2}-.2173906{col 26}{space 2} .0145068{col 37}{space 1}  -14.99{col 46}{space 3}0.000{col 54}{space 4}-.2458234{col 67}{space 3}-.1889579
+{txt}{space 5}ΔEPU_US {c |}{col 14}{res}{space 2} .0026263{col 26}{space 2} .0039437{col 37}{space 1}    0.67{col 46}{space 3}0.505{col 54}{space 4}-.0051031{col 67}{space 3} .0103558
+{txt}{space 8}ΔADS {c |}{col 14}{res}{space 2} .0049664{col 26}{space 2} .0019918{col 37}{space 1}    2.49{col 46}{space 3}0.013{col 54}{space 4} .0010626{col 67}{space 3} .0088702
+{txt}{space 7}ΔTERM {c |}{col 14}{res}{space 2}-.0589437{col 26}{space 2} .0214197{col 37}{space 1}   -2.75{col 46}{space 3}0.006{col 54}{space 4}-.1009254{col 67}{space 3}-.0169619
+{txt}{space 12} {c |}
+{space 5}returns {c |}
+{space 9}L1. {c |}{col 14}{res}{space 2} .0594462{col 26}{space 2} .0136445{col 37}{space 1}    4.36{col 46}{space 3}0.000{col 54}{space 4} .0327035{col 67}{space 3} .0861889
+{txt}{space 12} {c |}
+{space 7}_cons {c |}{col 14}{res}{space 2} .0013385{col 26}{space 2} .0022123{col 37}{space 1}    0.61{col 46}{space 3}0.545{col 54}{space 4}-.0029976{col 67}{space 3} .0056745
+{txt}{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+     sigma_u {c |} {res}         0
+     {txt}sigma_e {c |} {res} .15504556
+         {txt}rho {c |} {res}         0{txt}   (fraction of variance due to u_i)
+{hline 13}{c BT}{hline 64}
+
+{com}. outreg2 using returns, word append ctitle(P25)
+{txt}{stata `"shellout using `"returns.rtf"'"':returns.rtf}
+{browse `"C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Outputs"' :dir}{com} : {txt}{stata `"seeout using "returns.txt""':seeout}
+
+{com}. xtreg volatility ΔGSV ΔVIX ΔEPU_US ΔADS ΔTERM L1.volatility if inlist(coin_id, 2, 3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26)
+{res}
+{txt}Random-effects GLS regression                   Number of obs     = {res}     4,937
+{txt}Group variable: {res}coin_id                         {txt}Number of groups  = {res}        25
+
+{txt}R-sq:                                           Obs per group:
+     within  = {res}0.0407                                         {txt}min = {res}        83
+{txt}     between = {res}0.9770                                         {txt}avg = {res}     197.5
+{txt}     overall = {res}0.0489                                         {txt}max = {res}       241
+
+                                                {txt}Wald chi2({res}6{txt})      =  {res}   253.43
+{txt}corr(u_i, X)   = {res}0{txt} (assumed)                    Prob > chi2       =     {res}0.0000
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}  volatility{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      z{col 46}   P>|z|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 8}ΔGSV {c |}{col 14}{res}{space 2} .0001993{col 26}{space 2} .0002337{col 37}{space 1}    0.85{col 46}{space 3}0.394{col 54}{space 4}-.0002587{col 67}{space 3} .0006574
+{txt}{space 8}ΔVIX {c |}{col 14}{res}{space 2} .0848416{col 26}{space 2} .0111602{col 37}{space 1}    7.60{col 46}{space 3}0.000{col 54}{space 4}  .062968{col 67}{space 3} .1067153
+{txt}{space 5}ΔEPU_US {c |}{col 14}{res}{space 2}-.0036256{col 26}{space 2} .0030159{col 37}{space 1}   -1.20{col 46}{space 3}0.229{col 54}{space 4}-.0095367{col 67}{space 3} .0022856
+{txt}{space 8}ΔADS {c |}{col 14}{res}{space 2}-.0046739{col 26}{space 2}  .001529{col 37}{space 1}   -3.06{col 46}{space 3}0.002{col 54}{space 4}-.0076707{col 67}{space 3} -.001677
+{txt}{space 7}ΔTERM {c |}{col 14}{res}{space 2} .0978431{col 26}{space 2} .0164271{col 37}{space 1}    5.96{col 46}{space 3}0.000{col 54}{space 4} .0656465{col 67}{space 3} .1300397
+{txt}{space 12} {c |}
+{space 2}volatility {c |}
+{space 9}L1. {c |}{col 14}{res}{space 2} .1718081{col 26}{space 2} .0138182{col 37}{space 1}   12.43{col 46}{space 3}0.000{col 54}{space 4} .1447249{col 67}{space 3} .1988913
+{txt}{space 12} {c |}
+{space 7}_cons {c |}{col 14}{res}{space 2} .0872474{col 26}{space 2} .0022469{col 37}{space 1}   38.83{col 46}{space 3}0.000{col 54}{space 4} .0828435{col 67}{space 3} .0916513
+{txt}{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+     sigma_u {c |} {res}         0
+     {txt}sigma_e {c |} {res} .11789724
+         {txt}rho {c |} {res}         0{txt}   (fraction of variance due to u_i)
+{hline 13}{c BT}{hline 64}
+
+{com}. outreg2 using volatility, word append ctitle(P25)
+{txt}{stata `"shellout using `"volatility.rtf"'"':volatility.rtf}
+{browse `"C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Outputs"' :dir}{com} : {txt}{stata `"seeout using "volatility.txt""':seeout}
+
+{com}. 
+. // Panel of 50 highest market-cap altcoins
+. //Univariate
+. xtreg returns ΔGSV 
+{res}
+{txt}Random-effects GLS regression                   Number of obs     = {res}     9,815
+{txt}Group variable: {res}coin_id                         {txt}Number of groups  = {res}        50
+
+{txt}R-sq:                                           Obs per group:
+     within  = {res}0.0217                                         {txt}min = {res}        61
+{txt}     between = {res}0.1727                                         {txt}avg = {res}     196.3
+{txt}     overall = {res}0.0217                                         {txt}max = {res}       260
+
+                                                {txt}Wald chi2({res}1{txt})      =  {res}   217.79
+{txt}corr(u_i, X)   = {res}0{txt} (assumed)                    Prob > chi2       =     {res}0.0000
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}     returns{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      z{col 46}   P>|z|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 8}ΔGSV {c |}{col 14}{res}{space 2} .0031162{col 26}{space 2} .0002112{col 37}{space 1}   14.76{col 46}{space 3}0.000{col 54}{space 4} .0027023{col 67}{space 3} .0035301
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .0040901{col 26}{space 2} .0017759{col 37}{space 1}    2.30{col 46}{space 3}0.021{col 54}{space 4} .0006095{col 67}{space 3} .0075708
+{txt}{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+     sigma_u {c |} {res}         0
+     {txt}sigma_e {c |} {res} .17603887
+         {txt}rho {c |} {res}         0{txt}   (fraction of variance due to u_i)
+{hline 13}{c BT}{hline 64}
+
+{com}. outreg2 using uni_returns, word append ctitle(P50)
+{txt}{stata `"shellout using `"uni_returns.rtf"'"':uni_returns.rtf}
+{browse `"C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Outputs"' :dir}{com} : {txt}{stata `"seeout using "uni_returns.txt""':seeout}
+
+{com}. xtreg volatility ΔGSV 
+{res}
+{txt}Random-effects GLS regression                   Number of obs     = {res}     9,815
+{txt}Group variable: {res}coin_id                         {txt}Number of groups  = {res}        50
+
+{txt}R-sq:                                           Obs per group:
+     within  = {res}0.0002                                         {txt}min = {res}        61
+{txt}     between = {res}0.0518                                         {txt}avg = {res}     196.3
+{txt}     overall = {res}0.0002                                         {txt}max = {res}       260
+
+                                                {txt}Wald chi2({res}1{txt})      =  {res}     2.14
+{txt}corr(u_i, X)   = {res}0{txt} (assumed)                    Prob > chi2       =     {res}0.1432
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}  volatility{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      z{col 46}   P>|z|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 8}ΔGSV {c |}{col 14}{res}{space 2} .0002287{col 26}{space 2} .0001562{col 37}{space 1}    1.46{col 46}{space 3}0.143{col 54}{space 4}-.0000774{col 67}{space 3} .0005348
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2}  .121371{col 26}{space 2} .0040657{col 37}{space 1}   29.85{col 46}{space 3}0.000{col 54}{space 4} .1134024{col 67}{space 3} .1293396
+{txt}{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+     sigma_u {c |} {res} .02699649
+     {txt}sigma_e {c |} {res} .13009324
+         {txt}rho {c |} {res} .04128521{txt}   (fraction of variance due to u_i)
+{hline 13}{c BT}{hline 64}
+
+{com}. outreg2 using uni_volatility, word append ctitle(P50)
+{txt}{stata `"shellout using `"uni_volatility.rtf"'"':uni_volatility.rtf}
+{browse `"C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Outputs"' :dir}{com} : {txt}{stata `"seeout using "uni_volatility.txt""':seeout}
+
+{com}. // Full
+. xtreg returns ΔGSV ΔVIX ΔEPU_US ΔADS ΔTERM L1.returns
+{res}
+{txt}Random-effects GLS regression                   Number of obs     = {res}     9,062
+{txt}Group variable: {res}coin_id                         {txt}Number of groups  = {res}        50
+
+{txt}R-sq:                                           Obs per group:
+     within  = {res}0.0738                                         {txt}min = {res}        56
+{txt}     between = {res}0.4277                                         {txt}avg = {res}     181.2
+{txt}     overall = {res}0.0742                                         {txt}max = {res}       241
+
+                                                {txt}Wald chi2({res}6{txt})      =  {res}   725.64
+{txt}corr(u_i, X)   = {res}0{txt} (assumed)                    Prob > chi2       =     {res}0.0000
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}     returns{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      z{col 46}   P>|z|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 8}ΔGSV {c |}{col 14}{res}{space 2} .0032551{col 26}{space 2} .0002209{col 37}{space 1}   14.74{col 46}{space 3}0.000{col 54}{space 4} .0028222{col 67}{space 3}  .003688
+{txt}{space 8}ΔVIX {c |}{col 14}{res}{space 2}-.2414407{col 26}{space 2} .0118429{col 37}{space 1}  -20.39{col 46}{space 3}0.000{col 54}{space 4}-.2646524{col 67}{space 3}-.2182291
+{txt}{space 5}ΔEPU_US {c |}{col 14}{res}{space 2} .0035265{col 26}{space 2} .0031789{col 37}{space 1}    1.11{col 46}{space 3}0.267{col 54}{space 4} -.002704{col 67}{space 3}  .009757
+{txt}{space 8}ΔADS {c |}{col 14}{res}{space 2} .0064093{col 26}{space 2} .0017036{col 37}{space 1}    3.76{col 46}{space 3}0.000{col 54}{space 4} .0030704{col 67}{space 3} .0097483
+{txt}{space 7}ΔTERM {c |}{col 14}{res}{space 2}-.0746616{col 26}{space 2} .0169248{col 37}{space 1}   -4.41{col 46}{space 3}0.000{col 54}{space 4}-.1078336{col 67}{space 3}-.0414896
+{txt}{space 12} {c |}
+{space 5}returns {c |}
+{space 9}L1. {c |}{col 14}{res}{space 2} .0670682{col 26}{space 2} .0101427{col 37}{space 1}    6.61{col 46}{space 3}0.000{col 54}{space 4} .0471889{col 67}{space 3} .0869476
+{txt}{space 12} {c |}
+{space 7}_cons {c |}{col 14}{res}{space 2} .0007426{col 26}{space 2} .0017964{col 37}{space 1}    0.41{col 46}{space 3}0.679{col 54}{space 4}-.0027783{col 67}{space 3} .0042634
+{txt}{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+     sigma_u {c |} {res}         0
+     {txt}sigma_e {c |} {res}  .1705767
+         {txt}rho {c |} {res}         0{txt}   (fraction of variance due to u_i)
+{hline 13}{c BT}{hline 64}
+
+{com}. outreg2 using returns, word append ctitle(P50)
+{txt}{stata `"shellout using `"returns.rtf"'"':returns.rtf}
+{browse `"C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Outputs"' :dir}{com} : {txt}{stata `"seeout using "returns.txt""':seeout}
+
+{com}. xtreg volatility ΔGSV ΔVIX ΔEPU_US ΔADS ΔTERM L1.volatility
+{res}
+{txt}Random-effects GLS regression                   Number of obs     = {res}     9,062
+{txt}Group variable: {res}coin_id                         {txt}Number of groups  = {res}        50
+
+{txt}R-sq:                                           Obs per group:
+     within  = {res}0.0389                                         {txt}min = {res}        56
+{txt}     between = {res}0.9698                                         {txt}avg = {res}     181.2
+{txt}     overall = {res}0.0505                                         {txt}max = {res}       241
+
+                                                {txt}Wald chi2({res}6{txt})      =  {res}   481.32
+{txt}corr(u_i, X)   = {res}0{txt} (assumed)                    Prob > chi2       =     {res}0.0000
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}  volatility{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      z{col 46}   P>|z|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 8}ΔGSV {c |}{col 14}{res}{space 2} .0005353{col 26}{space 2} .0001673{col 37}{space 1}    3.20{col 46}{space 3}0.001{col 54}{space 4} .0002073{col 67}{space 3} .0008633
+{txt}{space 8}ΔVIX {c |}{col 14}{res}{space 2} .0952204{col 26}{space 2} .0089381{col 37}{space 1}   10.65{col 46}{space 3}0.000{col 54}{space 4} .0777021{col 67}{space 3} .1127388
+{txt}{space 5}ΔEPU_US {c |}{col 14}{res}{space 2}-.0026782{col 26}{space 2}  .002382{col 37}{space 1}   -1.12{col 46}{space 3}0.261{col 54}{space 4}-.0073468{col 67}{space 3} .0019904
+{txt}{space 8}ΔADS {c |}{col 14}{res}{space 2}-.0040279{col 26}{space 2} .0012825{col 37}{space 1}   -3.14{col 46}{space 3}0.002{col 54}{space 4}-.0065415{col 67}{space 3}-.0015143
+{txt}{space 7}ΔTERM {c |}{col 14}{res}{space 2} .1223196{col 26}{space 2}  .012734{col 37}{space 1}    9.61{col 46}{space 3}0.000{col 54}{space 4} .0973613{col 67}{space 3} .1472778
+{txt}{space 12} {c |}
+{space 2}volatility {c |}
+{space 9}L1. {c |}{col 14}{res}{space 2} .1729955{col 26}{space 2} .0102185{col 37}{space 1}   16.93{col 46}{space 3}0.000{col 54}{space 4} .1529676{col 67}{space 3} .1930234
+{txt}{space 12} {c |}
+{space 7}_cons {c |}{col 14}{res}{space 2} .0982654{col 26}{space 2} .0018202{col 37}{space 1}   53.99{col 46}{space 3}0.000{col 54}{space 4} .0946978{col 67}{space 3} .1018329
+{txt}{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+     sigma_u {c |} {res}         0
+     {txt}sigma_e {c |} {res} .12659258
+         {txt}rho {c |} {res}         0{txt}   (fraction of variance due to u_i)
+{hline 13}{c BT}{hline 64}
+
+{com}. outreg2 using volatility, word append ctitle(P50)
+{txt}{stata `"shellout using `"volatility.rtf"'"':volatility.rtf}
+{browse `"C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\Data\loop\Outputs"' :dir}{com} : {txt}{stata `"seeout using "volatility.txt""':seeout}
+
+{com}. 
+. 
+. 
+{txt}end of do-file
+
+{com}. log close
+      {txt}name:  {res}<unnamed>
+       {txt}log:  {res}C:\Users\krist\Documents\University\UvA\Semester 6\Thesis\STATA\Stata logs.smcl
+  {txt}log type:  {res}smcl
+ {txt}closed on:  {res}16 Jun 2023, 13:12:41
+{txt}{.-}
+{smcl}
+{txt}{sf}{ul off}
